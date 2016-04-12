@@ -1,0 +1,135 @@
+﻿@{
+    ViewBag.Title = "Cortana Intelligence Lead scoring demo";
+    ViewBag.Page = "Settings";
+}
+
+<script src="/Scripts/jquery-1.10.2.min.js"></script>
+<script src="/Scripts/jquery.form.js"></script>
+
+<div class="input-container clearfix">
+<div class="title">
+    Upload your data
+</div>
+<div class="input">
+    @using (Ajax.BeginForm("Retrain", "Api", null, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        InsertionMode = InsertionMode.Replace
+    }, new {enctype = "multipart/form-data"}))
+    {
+        <div class="form clearfix">
+            <input type="text" class="form-control input-line" readonly />
+            <span class="btn btn-primary btn-file input-line">
+                Browse <input type="file" name="inputFiles">
+            </span>
+            <input id="score-btn" class="btn btn-primary input-line" type="submit" value="Score">
+        </div>
+    }
+    <div id="progress-bar-container" class="invisible">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="RetrainingStatus"></div>
+    <div id="LeadGenerationStatus"></div>
+</div>
+<div class="message pull-right">
+    @using (Ajax.BeginForm("ResetDB", "Api", null, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        InsertionMode = InsertionMode.Replace
+    }, new {enctype = "multipart/form-data", @class = "pull-left"}))
+{
+    <input class="btn btn-primary" type="submit" value="Reset - Populates demo w/ sample data" style="margin: 0 5px;">
+    }
+    @using (Ajax.BeginForm("CleanDB", "Api", null, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        InsertionMode = InsertionMode.Replace
+    }, new {enctype = "multipart/form-data"}))
+{
+    <input class="btn btn-primary" type="submit" value="Clean - Removes all data and starts demo fresh">
+    }
+</div>
+</div>
+
+<script>
+    var width = 0;
+
+    setInterval(function () {
+        width = width >= 100 ? 0 : width + 5;
+        document.getElementById('progress-bar').style.width = width + '%';
+    }, 200);
+    var status = setInterval(function () {
+        $.ajax({
+            url: '@Url.Action("GetRetrainingStatus", "Home")', success: function (dataString) {
+                $('#RetrainingStatus').text("Retraining status: " + dataString);
+                if ((dataString == "Job Finished!" || dataString == "Job Failed :(")) {
+                    $('#score-btn').prop('disabled', false);
+                }
+            }, cache: false
+        });
+        $.ajax({
+            url: '@Url.Action("GetLeadGenerationStatus", "Home")', success: function (dataString) {
+                $('#LeadGenerationStatus').text("Lead generation status: " + dataString);
+                if ((dataString == "Job Finished!" || dataString == "Job Failed :(")) {
+                    $('#score-btn').prop('disabled', false);
+                }
+            }, cache: false
+        });
+        var d = new Date();
+        $('#TimeClock').text(d.toLocaleTimeString());
+
+    }, 1000);
+
+    $('#score-btn').click(function () {
+        $('#score-btn').prop('disabled', true);
+    });
+    $(document).ready(function () {
+        var targetObject = $('#AnalysisResults');
+        $('form').each(function (index) {
+            $(this).ajaxForm({
+                target: '#AnalysisResults',
+                beforeSend: function () {
+                    targetObject.html('Uploading: 0%');
+                },
+                uploadProgress: function (event, position, total, percentComplete) {
+                    if (percentComplete >= 100) {
+                        targetObject.html('Uploading complete. Processing...');
+                        var width = 0;
+                        setInterval(function () {
+                            width = width >= 100 ? 0 : width + 5;
+                            document.getElementById('progress-bar').style.width = width + '%';
+                        }, 200);
+                    } else {
+                        targetObject.html('Uploading: ' + percentComplete + '%');
+                    }
+                },
+                complete: function (response) {
+                    // For testing purposes.
+                    // console.log(response);
+                }
+            });
+        });
+    });
+    $(document).on('change', '.btn-file :file', function () {
+        var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        input.trigger('fileselect', [numFiles, label]);
+    });
+    $(document).ready(function () {
+        $('.btn-file :file').on('fileselect', function (event, numFiles, label) {
+
+            var input = $(this).parents('.form').find(':text'),
+                log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+            if (input.length) {
+                input.val(log);
+            } else {
+                if (log) alert(log);
+            }
+
+        });
+    });
+</script>
+
+

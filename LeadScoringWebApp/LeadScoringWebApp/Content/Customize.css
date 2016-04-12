@@ -1,0 +1,178 @@
+﻿/* Specific styles */
+
+@font-face {
+    font-family: segoe-ui-light;
+    font-style: normal;
+    font-weight: 400;
+    src: url(//i.s-microsoft.com/fonts/segoe-ui/west-european/light/latest.eot);
+    src: local("Segoe UI Light"),local("Segoe WP Light"),url(//i.s-microsoft.com/fonts/segoe-ui/west-european/light/latest.eot?#iefix) format("embedded-opentype"),url(//i.s-microsoft.com/fonts/segoe-ui/west-european/light/latest.woff) format("woff"),url(//i.s-microsoft.com/fonts/segoe-ui/west-european/light/latest.ttf) format("truetype");
+}
+
+body, a, h1, h2 {
+    font-family: segoe-ui-light,sans-serif;
+}
+
+
+body {
+    padding-top: 50px;
+}
+
+.site-title-2 {
+    color: #71b1d1;
+}
+
+p.left-alligned {
+    margin-right: 30%;
+}
+
+/* Bootstrap <pre> styling for scriptless CodeMirror <textarea> fallback */
+.pre-like {
+    display: block;
+    padding: 9.5px;
+    margin: 0 0 10px;
+    font-size: 13px;
+    line-height: 1.428571429;
+    color: #333333;
+    word-break: break-all;
+    word-wrap: break-word;
+    background-color: #f5f5f5;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-family: Monaco, Menlo, Consolas, "Courier New", monospace;
+    white-space: pre-wrap;
+    resize: none;
+    width: 100%;
+    height: 1000px;
+    max-width: none;
+}
+
+.CodeMirror {
+    margin-bottom: 20px;
+}
+
+#AnalysisResults, #status {
+    margin-top: 20px;
+}
+
+/* Bootstrap File Input. Source: http://www.abeautifulsite.net/whipping-file-inputs-into-shape-with-bootstrap-3/ */
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.input-container {
+    padding-top: 20px;
+    background-color: #eaeaea;
+}
+
+.input-container > * {
+    float: left;
+}
+
+.input-container > .title {
+    padding: 0 0 20px 30px;
+    font-size: 25px;
+}
+
+.input {
+    padding-left: 30px;
+}
+
+.input .input-line {
+    height: 100%;
+    width: 100px;
+}
+
+.form {
+    height: 30px;
+}
+
+.form > * {
+    float: left;
+}
+
+.form > .form-control {
+    width: auto;
+    background-color: #fff;
+    border-radius: 0;
+    border: none;
+    cursor: text;
+}
+
+.btn {
+    padding: 5px;
+    border: none;
+    border-radius: 0;
+}
+
+.btn-primary {
+    background-color: #00b294;
+}
+
+.btn-primary:active,
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #00997f;
+}
+
+.btn-file {
+    background-color: #888;
+    margin-right: 5px;
+}
+
+.btn-file:active,
+.btn-file:hover,
+.btn-file:focus {
+    background-color: #777;
+}
+
+#progress-bar-container {
+    margin: 10px 0;
+    width: 100%;
+    height: 5px;
+    border: 5px solid lightgray;
+}
+
+#progress-bar {
+    background-color: gray;
+    height: 5px;
+    margin-top:-2.5px;
+}
+
+#ScoringStatus {
+    margin-bottom: 5px;
+}
+
+.input-container > .message {
+    width: 650px;
+    margin: 0 30px 20px 20px;
+}
+
+iframe {
+    border: none;
+}
+
+#Report {
+    width: 100%;
+    height: calc(100vh - 174px);
+}
+
+/* Minimum powerbi size is 800x600 */
+.container-fluid {
+    min-width: 800px;
+}

@@ -1,0 +1,6 @@
+﻿@model ReportViewModel
+
+<div>
+    @Html.PowerBIAccessToken(Model.AccessToken)
+    @Html.PowerBIReportFor(m => m.Report, new { style = "height:60vh" })
+</div>

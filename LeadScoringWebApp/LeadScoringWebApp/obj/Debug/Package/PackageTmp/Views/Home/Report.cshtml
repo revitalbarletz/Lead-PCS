@@ -1,0 +1,23 @@
+﻿@{
+    ViewBag.Title = "Report";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+<h3>@ViewBag.AnotherMessage</h3>
+
+<div id="button">
+    Click Here
+</div>
+
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script>
+    var status = setInterval(function () {
+        var getStatus = '@Url.Action("GetStatus")';
+        $.ajax({ url: getStatus, success: function (dataString) {
+            $('h3').text(dataString);
+        }, cache: false});
+        var d = new Date();
+        $('h2').text(d.toLocaleTimeString());
+
+    }, 1000);
+</script>

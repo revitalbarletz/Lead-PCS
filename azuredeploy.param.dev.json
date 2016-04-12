@@ -1,0 +1,30 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "hostingPlanName": {
+            "value": "test1"
+        },
+        "administratorLogin": {
+            "value": "adlogin"
+        },
+        "databaseName": {
+            "value": "test1"
+        },
+        "LeadScoringWebAppPackageFolder": {
+            "value": "WebApplication3"
+        },
+        "LeadScoringWebAppPackageFileName": {
+            "value": "package.zip"
+        },
+        "administratorLoginPassword": {
+            "value": "yuyuyu"
+        },
+        "WebApplication3PackageFolder": {
+            "value": "WebApplication3"
+        },
+        "WebApplication3PackageFileName": {
+            "value": "package.zip"
+        }
+    }
+}

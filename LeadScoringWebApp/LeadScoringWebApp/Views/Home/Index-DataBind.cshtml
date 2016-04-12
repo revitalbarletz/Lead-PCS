@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Azure ML Text Analytics";
+}
+
+<h4>Text Analytics Demo</h4>
+
+
+<p class="left-alligned">Try out the Azure ML <a target="_blank" href="https://datamarket.azure.com/dataset/amla/text-analytics">
+        Text Analytics service</a> - for free.
+</p>
+
+<p>
+    <textarea id="inputHelpBlock" class="form-control" name="inputText" required="required"
+              rows="4" maxlength="1000" placeholder="Enter text to analyze (English only)"
+              style="max-width: 800px;" data-bind="value: inputText, valueUpdate: ['input', 'afterkeydown' ]"></textarea>
+</p>
+<p>
+    <input type="submit" class="btn btn-primary" value="Analyze" id="Analyze" data-bind="click: analyze" />
+</p>
+    
+<div id="WaitingForResults" style="border: none; display: none;
+                                    margin: auto;">
+    Analyzing <div id="ProgressBar">. </div>
+</div>
+
+<div data-bind="if: output.inProgress">Loading.....</div>
+<div data-bind="if: output.error">Error.....</div>
+<div data-bind="if: output.success">Done.....</div>
+<div id="AnalysisResults" data-bind="if: output">
+    <p>Sentiment: </p>
+    <div class="progress" style="max-width: 20%;">
+        <div data-bind="attr: { class: 'progress-bar ' + output().sentimentClass(), 'aria-valuenow': output().sentimentValue},
+                        text: output().sentimentValue,
+                        style: {width: output().sentimentValue() + '%' }" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="min-width: 2em;">
+
+        </div>
+    </div>
+    <p data-bind="if: output().KeyPhrases.length == 1 && !output().KeyPhrases[0]">
+        No key phrases found in your string.
+    </p>
+    <p data-bind="ifnot: output().KeyPhrases.length == 1 && !output().KeyPhrases[0]">
+        Key phrases highlighted below:
+    </p>
+    <p>Html.Raw(keyPhraseStr)</p>
+</div>
+<div id="ServiceDescription" style="display: none;">
+    <p class="left-alligned">How to interpret these results -
+    </p>
+        <ul>
+            <li>
+                <p class="left-alligned">
+                    Sentiment score above represents the overall sentiment contained in the text, and is returned as a percentage between 0 & 100.
+                    Scores close to 100% indicate positive sentiment, while scores close to 0% indicate negative sentiment.
+                </p>
+        </li>
+        <li>
+            Key phrases denote the key talking points in your text.
+        </li>
+    </ul>
+
+</div>
+
+<hr/>
+<p class="left-alligned">
+    To use the service in production, you can get access to its API by <a target="_blank" href="https://datamarket.azure.com/dataset/amla/text-analytics">
+    signing up
+</a> for it. For questions/comments, please use the "Feedback" button in the top right.
+</p>

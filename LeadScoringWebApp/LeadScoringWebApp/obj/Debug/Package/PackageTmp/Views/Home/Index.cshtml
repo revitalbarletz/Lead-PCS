@@ -1,0 +1,128 @@
+﻿@{
+    ViewBag.Title = "Cortana Intelligence Lead scoring demo";
+    ViewBag.Page = "Home";
+}
+
+<script src="/Scripts/jquery-1.10.2.min.js"></script>
+<script src="/Scripts/jquery.form.js"></script>
+
+<div class="input-container clearfix">
+    <div class="title">
+        Upload your data
+    </div>  
+    <div class="input">
+        @using (Ajax.BeginForm("Score", "Api", null, new AjaxOptions
+        {
+            HttpMethod = "POST",
+        }, new { enctype = "multipart/form-data" }))
+        {
+        <div class="form clearfix">
+            <input type="text" class="form-control input-line" readonly/>
+            <span class="btn btn-primary btn-file input-line">
+                Browse <input type="file" name="inputFiles">
+            </span>
+            <input id="score-btn" class="btn btn-primary input-line" type="submit" value="Score">
+        </div>
+        }
+        <div id="progress-bar-container">
+            <div id="progress-bar" style="width:0%"></div>
+        </div>
+        <div id="ScoringStatus">
+            Scoring status:
+        </div>
+    </div>
+    <div class="message">
+        Cortana Intelligence brings a new level of insights to your lead pipeline. Using the power of Azure Machine Learning 
+        and enriching your data with insights from Bing- Cortana Intelligence predicts the best leads and even generates new leads. 
+        <br />
+        <i>Please upload the data to be processed with Browse, then press Score.</i>
+    </div>
+</div>
+
+@*<div id="TimeClock"></div>  *@
+
+@Html.Action("ReportsSync", "Home")
+
+<script>
+    //global variables used for processing calculation time based on file size
+    var progressUpdateIntervalInMs = 200;
+    var normalizedProgressUpdateValue = 0;
+    var width = 0;
+    var processing = false;
+    $(document).ready(function () {
+
+        var powerBiReportVisible = false;
+
+        var status = setInterval(function() {
+        $.ajax({
+                url: '@Url.Action("GetScoringStatus", "Home")',
+                success: function(dataString) {
+                $('#ScoringStatus').text("Scoring status: " + dataString);
+
+                if ((dataString == "Job Finished!" || dataString == "Job Failed :(") && powerBiReportVisible == false) {
+                    $('#powerBiReport').removeClass('invisible');
+                    powerBiReportVisible = true;
+                    processing = false;
+                    width = 100;
+
+                    //No need to do this because the Score POST ActionResult is forcing a page refresh
+                    //var iframe = document.getElementById('#dashboard');
+                    //if (iframe != null) {
+                    //    iframe.src = iframe.src;  
+                    //      }
+                }
+            }, cache: false
+            });
+
+        }, 1000);
+        
+        setInterval(function () {
+            if (processing) {
+                width = width >= 100 ? 100 : width + normalizedProgressUpdateValue;
+                document.getElementById('progress-bar').style.width = width + '%';
+                $('#score-btn').prop('disabled', true);
+            }
+            else {
+                $('#score-btn').prop('disabled', false);
+            }
+        }, progressUpdateIntervalInMs);
+    });
+    
+    //Reset everything on score
+    $('#score-btn').click(function(){
+        width = 0;
+        processing = true;
+        $('#powerBiReport').addClass('invisible');
+    });
+
+
+
+    $(document).on('change', '.btn-file :file', function () {
+        var input = $(this),
+            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        input.trigger('fileselect', [numFiles, label]);
+        
+        //use a simple observed hueristic for ~50kb per second processing of lead records (75 seconds is the average BES overhead)
+        var bytes = input.get(0).files[0].size;
+        var kb = Math.round(parseInt(bytes) / 1024);
+        var estimatedTimeInSeconds = 75 + (kb / 50);
+        normalizedProgressUpdateValue = estimatedTimeInSeconds / ((1000 / progressUpdateIntervalInMs) * (estimatedTimeInSeconds));
+        width = 0;
+    });
+    $(document).ready(function () {
+        $('.btn-file :file').on('fileselect', function (event, numFiles, label) {
+
+            var input = $(this).parents('.form').find(':text'),
+                log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+            if (input.length) {
+                input.val(log);
+            } else {
+                if (log) alert(log);
+            }
+        });
+    });
+</script>
+
+

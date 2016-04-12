@@ -1,0 +1,6 @@
+﻿@model ReportViewModel
+
+<div id="powerBiReport" class="invisible">
+    @Html.PowerBIAccessToken(Model.AccessToken)
+    @Html.PowerBIReportFor(m => m.Report)
+</div>
