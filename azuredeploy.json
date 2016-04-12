@@ -27,6 +27,16 @@
         "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
       }
     },
+    "repoUrl": { 
+       "type": "string" 
+     },
+    "branch": {
+      "type": "string"
+    },
+    "someAppSetting": { 
+       "type": "string", 
+       "defaultValue": "Test App Setting Value" 
+     }, 
     "skuCapacity": {
       "type": "int",
       "defaultValue": 1,
@@ -77,6 +87,28 @@
         "description": "Describes the performance level for Edition"
       }
     },
+      "testStorageType": {
+          "type": "string",
+          "defaultValue": "Standard_LRS",
+          "allowedValues": [
+              "Standard_LRS",
+              "Standard_ZRS",
+              "Standard_GRS",
+              "Standard_RAGRS",
+              "Premium_LRS"
+          ]
+      },
+      "adstorageType": {
+          "type": "string",
+          "defaultValue": "Standard_LRS",
+          "allowedValues": [
+              "Standard_LRS",
+              "Standard_ZRS",
+              "Standard_GRS",
+              "Standard_RAGRS",
+              "Premium_LRS"
+          ]
+      },
       "_artifactsLocation": {
           "type": "string"
       },
@@ -96,25 +128,13 @@
           "metadata": {
               "description": "Name of the webdeploy package"
           }
-      },
-      "WebApplication3PackageFolder": {
-          "type": "string",
-          "minLength": 1,
-          "metadata": {
-              "description": "WebDeploy package location. This path is relative to the _artifactsLocation parameter"
-          }
-      },
-      "WebApplication3PackageFileName": {
-          "type": "string",
-          "minLength": 1,
-          "metadata": {
-              "description": "Name of the webdeploy package"
-          }
       }
   },
   "variables": {
     "webSiteName": "[concat('webSite', uniqueString(resourceGroup().id))]",
-    "sqlserverName": "[concat('sqlserver', uniqueString(resourceGroup().id))]"
+    "sqlserverName": "[concat('sqlserver', uniqueString(resourceGroup().id))]",
+      "testStorageName": "[concat('testStorage', uniqueString(resourceGroup().id))]",
+      "adstorageName": "[concat('adstorage', uniqueString(resourceGroup().id))]"
   },
   "resources": [
     {
@@ -179,59 +199,93 @@
         "name": "[parameters('hostingPlanName')]"
       }
     },
-    {
-      "apiVersion": "2015-08-01",
-      "name": "[variables('webSiteName')]",
-      "type": "Microsoft.Web/sites",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]"
-      ],
-      "tags": {
-        "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "empty",
-        "displayName": "Website"
-      },
-      "properties": {
-        "name": "[variables('webSiteName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
-      },
-      "resources": [
-        {
-          "apiVersion": "2015-08-01",
-          "type": "config",
-          "name": "connectionstrings",
-          "dependsOn": [
-            "[concat('Microsoft.Web/Sites/', variables('webSiteName'))]"
-          ],
-          "properties": {
-            "DefaultConnection": {
-              "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', parameters('databaseName'), ';User Id=', parameters('administratorLogin'), '@', variables('sqlserverName'), ';Password=', parameters('administratorLoginPassword'), ';')]",
-              "type": "SQLServer"
-            }
-          }
-        },
-          {
-              "name": "MSDeploy",
-              "type": "extensions",
-              "location": "[resourceGroup().location]",
-              "apiVersion": "2015-08-01",
-              "dependsOn": [
-                  "[concat('Microsoft.Web/sites/', variables('webSiteName'))]"
-              ],
-              "tags": {
-                  "displayName": "WebApplication3"
-              },
-              "properties": {
-                  "packageUri": "[concat(parameters('_artifactsLocation'), '/', parameters('WebApplication3PackageFolder'), '/', parameters('WebApplication3PackageFileName'), parameters('_artifactsLocationSasToken'))]",
-                  "dbType": "None",
-                  "connectionString": "",
-                  "setParameters": {
-                      "IIS Web Application Name": "[variables('webSiteName')]"
-                  }
-              }
-          }
-      ]
-    },
+    //{
+    //  "apiVersion": "2015-08-01",
+    //  "name": "[variables('webSiteName')]",
+    //  "type": "Microsoft.Web/sites",
+    //  "location": "[resourceGroup().location]",
+    //  "dependsOn": [
+    //    "[concat('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]"
+    //  ],
+    //  "tags": {
+    //    "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "empty",
+    //    "displayName": "Website"
+    //  },
+    //  "properties": {
+    //    "name": "[variables('webSiteName')]",
+    //    "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+    //  },
+    //  "resources": [
+    //    {
+    //          "name": "MSDeploy",
+    //          "type": "extensions",
+    //          "location": "[resourceGroup().location]",
+    //          "apiVersion": "2015-08-01",
+    //          "dependsOn": [
+    //              "[concat('Microsoft.Web/sites/', variables('webSiteName'))]"
+    //          ],
+    //          "tags": {
+    //              "displayName": "LeadScoringWebApp"
+    //          },
+    //          "properties": {
+    //              "packageUri": "[concat(parameters('_artifactsLocation'), '/', parameters('LeadScoringWebAppPackageFolder'), '/', parameters('LeadScoringWebAppPackageFileName'), parameters('_artifactsLocationSasToken'))]",
+    //              "dbType": "None",
+    //              "connectionString": "",
+    //              "setParameters": {
+    //                  "IIS Web Application Name": "[variables('webSiteName')]"
+    //              }
+    //          }
+    //      }
+    //  ]
+    //},
+    { 
+       "apiVersion": "2015-08-01", 
+       "name": "[variables('webSiteName')]", 
+       "type": "Microsoft.Web/sites", 
+       "location": "[resourceGroup().location]", 
+       "dependsOn": [ 
+         "[concat('Microsoft.Web/serverFarms/', parameters('hostingPlanName'))]" 
+       ], 
+       "tags": { 
+         "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "empty" 
+       }, 
+       "properties": { 
+         "name": "[variables('webSiteName')]", 
+         "serverFarm": "[parameters('hostingPlanName')]" 
+       }, 
+       "resources": [ 
+         { 
+           "apiVersion": "2015-08-01", 
+           "type": "config", 
+           "name": "web", 
+           "dependsOn": [ 
+             "[concat('Microsoft.Web/Sites/', variables('webSiteName'))]" 
+           ], 
+           "properties": { 
+             "appSettings": [ 
+               { 
+                 "name": "someAppSetting", 
+                 "value": "[parameters('someAppSetting')]" 
+               } 
+             ] 
+           } 
+         }, 
+         { 
+           "apiVersion": "2015-08-01", 
+           "name": "web", 
+           "type": "sourcecontrols", 
+           "dependsOn": [ 
+            "[resourceId('Microsoft.Web/Sites', variables('webSiteName'))]", 
+             "[concat('Microsoft.Web/Sites/', variables('webSiteName'), '/config/web')]" 
+           ], 
+           "properties": { 
+             "RepoUrl": "[parameters('repoUrl')]", 
+            "branch": "[parameters('branch')]",
+            "IsManualIntegration": true 
+           } 
+         } 
+       ] 
+     }, 
     {
       "apiVersion": "2014-04-01",
       "name": "[concat(parameters('hostingPlanName'), '-', resourceGroup().name)]",
@@ -448,6 +502,19 @@
       },
       "properties": {
         "ApplicationId": "[variables('webSiteName')]"
+      }
+    },
+    {
+      "name": "[variables('adstorageName')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "adstorage"
+      },
+      "properties": {
+        "accountType": "[parameters('adstorageType')]"
       }
     }
   ]
