@@ -109,19 +109,6 @@
               "Premium_LRS"
           ]
       },
-      "_artifactsLocation": {
-          "type": "string"
-      },
-      "_artifactsLocationSasToken": {
-          "type": "securestring"
-      },
-      "LeadScoringWebAppPackageFolder": {
-          "type": "string",
-          "minLength": 1,
-          "metadata": {
-              "description": "WebDeploy package location. This path is relative to the _artifactsLocation parameter"
-          }
-      },
       "LeadScoringWebAppPackageFileName": {
           "type": "string",
           "minLength": 1,
